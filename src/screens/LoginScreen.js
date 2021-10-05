@@ -1,28 +1,35 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { title } from 'react-native-paper';
+import { Title } from 'react-native-paper';
 import FormInput from '../components/FormInput';
 import FormButton from '../components/FormButton';
 
 export default function LoginScreen({ navigation }) {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+
+    function logginIn(email, password) {
+        console.log(email, password);
+        if (email === 'joshua.bacani12@gmail.com' && password === '123@123') {
+            console.log('here');
+            navigation.navigate('Home');
+        }
+        else return false
+    }
     
     return (
         <View style={styles.container}>
-            <Title style={style.titleText}>Welcome to PTown</Title>
+            <Title style={styles.titleText}>Welcome to PTown</Title>
             <FormInput
-                labelEmai='Email'
+                labelName='Email'
                 value={email}
-                placeholder='ENTER EMAIL HERE'
                 autoCapitalize='none'
                 onChangeText={userEmail => setEmail(userEmail)}
             />
             <FormInput
-                labelEmai='Password'
-                placeholder='ENTER PASSWORD HERE'
+                labelName='Password'
                 value={password}
-                secureText={true}
+                secureTextEntry={true}
                 autoCapitalize='none'
                 onChangeText={password => setPassword(password)}
             />
@@ -30,6 +37,7 @@ export default function LoginScreen({ navigation }) {
                 title='Login'
                 modeValue='contained'
                 labelStyle={styles.loginButtonLabel}
+                onPress={() => logginIn(email, password)}
             />
             <FormButton
                 title='New User? Join Here'
@@ -44,7 +52,7 @@ export default function LoginScreen({ navigation }) {
 
 const styles = StyleSheet.create({
     container: {
-        backgrounColor: '#F5F5F5',
+        backgroundColor: '#F5F5F5',
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center'
@@ -57,6 +65,6 @@ const styles = StyleSheet.create({
         fontSize: 22
     },
     navButtonText: {
-        fontSize: 16
+        fontSize: 12
     }
 });

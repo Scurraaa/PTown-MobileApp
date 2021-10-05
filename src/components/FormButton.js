@@ -7,7 +7,9 @@ const { width, height } = Dimensions.get('screen');
 
 export default function FormButton({ title, modeValue, ...rest}) {
     return (
-        <Button {...rest}
+        <Button 
+        {...rest}
+        mode={modeValue}
         style={styles.button}
         contentStyle={styles.buttonContainer}
         >
@@ -22,6 +24,6 @@ const styles = StyleSheet.create({
     },
     buttonContainer: {
         width: width / 2,
-        height: height / 15
+        height: height / 18
     }
 });
