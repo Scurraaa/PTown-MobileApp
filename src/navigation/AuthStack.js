@@ -3,6 +3,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import LoginScreen from '../screens/LoginScreen'
 import SignupScreen from '../screens/SignupScreen';
 import BottomTabs from './BottomNavigation';
+import RegisterAs from '../screens/RegisterAsScreen'
 
 const Stack = createStackNavigator()
 
@@ -12,6 +13,7 @@ export default function AuthStack() {
             <Stack.Screen name='Login' component={LoginScreen} />
             <Stack.Screen name='Signup' component={SignupScreen} />
             <Stack.Screen name='Home' component={BottomTabs} />
+            <Stack.Screen name='RegisterAs' component={RegisterAs} />
         </Stack.Navigator>
     );
 }

@@ -1,16 +1,16 @@
 import React from 'react';
-import { StyleSheet, Dimensions, Text } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 import { Button } from 'react-native-paper';
+import { SCREEN_HEIGHT } from '../utils/constants';
 
 
-const { width, height } = Dimensions.get('screen');
 
-export default function FormButton({ title, modeValue, ...rest}) {
+export default function FormButton({ title, modeValue, buttonStyle, ...rest}) {
     return (
         <Button 
         {...rest}
         mode={modeValue}
-        style={styles.button}
+        style={buttonStyle ? buttonStyle : styles.button}
         contentStyle={styles.buttonContainer}
         >
             { title }
@@ -23,7 +23,6 @@ const styles = StyleSheet.create({
         marginTop: 10
     },
     buttonContainer: {
-        width: width / 2,
-        height: height / 18
+        height: SCREEN_HEIGHT / 18
     }
 });

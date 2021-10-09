@@ -5,8 +5,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import BarberShopScreen from "../screens/BarberShopScreen";
 import MapScreen from "../screens/MapScreen";
 import ProfileScreen from "../screens/ProfileScreen";
-import AuthStack from '../navigation/AuthStack';
-
+import LoginScreen from '../screens/LoginScreen';
 const Tab = createMaterialBottomTabNavigator();
 
 export default function BottomTabs() {

@@ -1,18 +1,46 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Title } from 'react-native-paper';
 import FormInput from '../components/FormInput';
 import FormButton from '../components/FormButton';
+import Toast from 'react-native-toast-message'
+import { TOAST_TIMEOUT, SCREEN_WIDTH } from '../utils/constants';
 
 export default function LoginScreen({ navigation }) {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 
+
     function logginIn(email, password) {
         console.log(email, password);
-        if (email === 'joshua.bacani12@gmail.com' && password === '123@123') {
-            console.log('here');
-            navigation.navigate('Home');
+        // temp db
+        if (email && password) {
+            if (email === 'john.doe@gmail.com' && password === '123@123') {
+                Toast.show({
+                    type: 'success',
+                    position: 'bottom',
+                    text1: 'Successfully Logged in!',
+                    visibilityTime: TOAST_TIMEOUT,
+                    style: {
+                        backgroundColor: '#6200ee'
+                    },
+                    autoHide: true,
+                    onHide: () => {
+                        navigation.navigate('Home')
+                    }
+                })
+            } else {
+                Toast.show({
+                    type: 'error',
+                    position: 'bottom',
+                    text1: 'Failed to Logged in!',
+                    style: {
+                        backgroundColor: '#6200ee'
+                    },
+                    visibilityTime: TOAST_TIMEOUT,
+                    autoHide: true,
+                })
+            }
         }
         else return false
     }
@@ -37,6 +65,7 @@ export default function LoginScreen({ navigation }) {
                 title='Login'
                 modeValue='contained'
                 labelStyle={styles.loginButtonLabel}
+                buttonStyle={styles.loginButtonContainer}
                 onPress={() => logginIn(email, password)}
             />
             <FormButton
@@ -44,7 +73,7 @@ export default function LoginScreen({ navigation }) {
                 modeValue='text'
                 uppercase={true}
                 labelStyle={styles.navButtonText}
-                onPress={() => navigation.navigate('Signup')}
+                onPress={() => navigation.navigate('RegisterAs')}
             />
         </View>
     )
@@ -61,10 +90,13 @@ const styles = StyleSheet.create({
         fontSize: 24,
         marginBottom: 20
     },
+    loginButtonContainer: {
+        width: SCREEN_WIDTH / 1.5
+    },
     loginButtonLabel: {
-        fontSize: 22
+        fontSize: 18
     },
     navButtonText: {
-        fontSize: 12
+        fontSize: 14
     }
 });

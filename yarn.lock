@@ -2840,6 +2840,15 @@ expo-font@~9.2.1:
     expo-modules-core "~0.2.0"
     fontfaceobserver "^2.1.0"
 
+expo-image-picker@^10.2.3:
+  version "10.2.3"
+  resolved "https://registry.yarnpkg.com/expo-image-picker/-/expo-image-picker-10.2.3.tgz#204c83ba0731f2ccdbc42e13f9bf6e37be21c354"
+  integrity sha512-8VXLYjclXoQJHbdNLI21rdbnxFisBpZ6TgIifHf9kZ/momFBegUNqEKCjosvxVGVM8f7qaQxJV/znNtW0rDM/w==
+  dependencies:
+    "@expo/config-plugins" "^3.0.0"
+    expo-modules-core "~0.2.0"
+    uuid "7.0.2"
+
 expo-keep-awake@~9.2.0:
   version "9.2.0"
   resolved "https://registry.yarnpkg.com/expo-keep-awake/-/expo-keep-awake-9.2.0.tgz#9cbdcc8264c943ef29a58326236cd34267e98f43"
@@ -4986,6 +4995,13 @@ react-native-screens@~3.4.0:
   dependencies:
     warn-once "^0.1.0"
 
+react-native-toast-message@^1.6.0:
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/react-native-toast-message/-/react-native-toast-message-1.6.0.tgz#863466ff78429902c7182bc08dd8d879476c0a3b"
+  integrity sha512-EDXSGyuhRdy5/S4bDlfJ/fkKXM7Gxz6OTx0obBS5kyGq+ci8rvrrOVJkYhgYyjdppYdzCMIvNuIxkUkCjk80fw==
+  dependencies:
+    prop-types "^15.7.2"
+
 react-native-vector-icons@^8.1.0:
   version "8.1.0"
   resolved "https://registry.yarnpkg.com/react-native-vector-icons/-/react-native-vector-icons-8.1.0.tgz#e8ee2b17bc4d9f636da1c6f67feee8e2a850c3d8"
@@ -5937,6 +5953,11 @@ utils-merge@1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/utils-merge/-/utils-merge-1.0.1.tgz#9f95710f50a267947b2ccc124741c1028427e713"
   integrity sha1-n5VxD1CiZ5R7LMwSR0HBAoQn5xM=
+
+uuid@7.0.2:
+  version "7.0.2"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-7.0.2.tgz#7ff5c203467e91f5e0d85cfcbaaf7d2ebbca9be6"
+  integrity sha512-vy9V/+pKG+5ZTYKf+VcphF5Oc6EFiu3W8Nv3P3zIh0EqVI80ZxOzuPfe9EHjkFNvf8+xuTHVeei4Drydlx4zjw==
 
 uuid@^3.3.2, uuid@^3.4.0:
   version "3.4.0"
