@@ -55,17 +55,6 @@ export default function BottomTabs() {
                     )
                 }}
             />
-            <Tab.Screen
-                name='Login'
-                component={LoginScreen}
-                options={{
-                    tabBarVisible: false,
-                    tabBarLabel: 'Logout',
-                    tabBarIcon: ({ color }) => (
-                        <Icon name='logout' color={color} size={26}/>
-                    )
-                }}
-            />
         </Tab.Navigator>
     )
 }

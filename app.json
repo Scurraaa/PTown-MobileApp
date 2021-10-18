@@ -24,7 +24,12 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.scurra.PTown"
+      "package": "com.scurra.PTown",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyBQNoCLKi6hnX3EWusV5LP5OTijlCQZaZE"
+        }
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"

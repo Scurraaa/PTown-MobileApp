@@ -5,11 +5,14 @@ import FormInput from '../components/FormInput';
 import FormButton from '../components/FormButton';
 import { AntDesign } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import { SCREEN_WIDTH, TOAST_TIMEOUT } from '../utils/constants';
+import { BASE_URL, SCREEN_WIDTH, TOAST_TIMEOUT } from '../utils/constants';
 import Toast from 'react-native-toast-message';
 import Loading from '../components/Loading';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function SignupScreen({ route, navigation }) {
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fname, setFname] = useState('');
@@ -32,28 +35,66 @@ export default function SignupScreen({ route, navigation }) {
     }
   };
 
-  function register() {
-    setLoading(true);
-    if (email && password &&  confirmPassword && fname && lname && address) {
+  function register(userType) {
+    if (username && email && password &&  confirmPassword && fname && lname && address) {
+      setLoading(true);
       if (password === confirmPassword) {
-        Toast.show({
-          type: 'success',
-          position: 'bottom',
-          text1: 'Successfully Registered!',
-          visibilityTime: TOAST_TIMEOUT,
-          style: {
-              backgroundColor: '#6200ee'
+        const userData = {
+          user: {
+            username: username,
+            first_name: fname,
+            last_name: lname,
+            email: email,
+            password: password
           },
-          autoHide: true,
-          onHide: () => {
+          contact_number: contact,
+          address: address,
+          account_type: userType === 'customer' ? 'user' : 'owner'
+        }
+        const axiosReq = axios({
+          method: 'POST',
+          url: `${BASE_URL}/api/profile/`,
+          data: userData
+        }).then(async function(response) {
+          console.log('RESPONSE DATA', response.data)
+          const responseData = await response.data
+          getToken(username, password)
+          uploadPhoto(responseData.id)
+          Toast.show({
+            type: 'success',
+            position: 'bottom',
+            text1: 'INFO',
+            text2: 'Successfully Registered!',
+            visibilityTime: TOAST_TIMEOUT,
+            style: {
+                backgroundColor: '#6200ee'
+            },
+            autoHide: true,
+            onHide: () => {
               navigation.navigate('Home')
-          }
+            }
+          })
+        }).catch(function(error){
+          console.log('ERROR DATA1', error)
+          console.log('ERROR DATA2', error.response.data)
+          Toast.show({
+            type: 'error',
+            position: 'bottom',
+            text1: 'INFO',
+            text2: 'Unsuccessfully on registering',
+            visibilityTime: TOAST_TIMEOUT,
+            style: {
+                backgroundColor: '#6200ee'
+            },
+            autoHide: true,
+          })
         })
       } else {
         Toast.show({
           type: 'error',
           position: 'bottom',
-          text1: 'Password mismatch!',
+          text1: 'INFO',
+          text2: 'Password mismatch!',
           visibilityTime: 5000,
           style: {
               backgroundColor: '#6200ee'
@@ -64,7 +105,7 @@ export default function SignupScreen({ route, navigation }) {
       Toast.show({
         type: 'error',
         position: 'bottom',
-        text1: 'Missing Field',
+        text1: 'INFO',
         text2: 'Missing Field maybe in the following: email, password, first name, last name and address',
         visibilityTime: 5000,
         style: {
@@ -75,122 +116,167 @@ export default function SignupScreen({ route, navigation }) {
     setLoading(false);
   }
 
+  function getToken(username, password) {
+    axios({
+      headers: {
+        'content-type': 'application/json',
+        'accept': 'application/json'
+      },
+      method: 'POST',
+      data: {
+        username: username,
+        password: password
+      },
+      url: `${BASE_URL}/api/token/`
+    }).then(async (response) => {
+      await AsyncStorage.setItem('token', response.data.access)
+      await AsyncStorage.setItem('loggedin', "true")
+    })
+  }
+
+  function uploadPhoto(id) {
+    if (image) {
+      const formData = new FormData()
+      formData.append('photo', {
+        uri: image,
+        type: 'image/jpeg',
+        name: 'name.jpg'
+      })
+      axios({
+        headers: {
+          'content-type': 'multipart/form-data'
+        },
+        method: 'PATCH',
+        url: `${BASE_URL}/api/profile/${id}/`,
+        data: formData
+      }).then(async function(response) {
+        console.log('RESPONSE FROM PATCH', response.data)
+      }).catch(function(error) {
+        console.log('ERROR FROM PATCH1', error)
+        console.log('ERROR FROM PATCH2', error.response)
+      })
+    }
+  }
+
 
   const data = route.params;
 
   return (
     <View style={styles.container}>
-      {loading ? (
-        <Loading size='large'/>
-      ) : (
-        <ScrollView>
-        <Title style={styles.titleText}>{
-          data.registerAs === 'customer' ? 'Register as Customer' : 'Register as Barbershop'
-        }</Title>
-        {
-          data.registerAs === 'customer' ? (
-            <View style={styles.containerForm}>
-              <View style={imageUploaderStyles.container}>
-                  {
-                      image  && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />
-                  }
-                      
-                      <View style={imageUploaderStyles.uploadBtnContainer}>
-                          <TouchableOpacity onPress={addImage} style={imageUploaderStyles.uploadBtn} >
-                              <Text>{image ? 'Edit' : 'Upload'} Image</Text>
-                              <AntDesign name="camera" size={20} color="black" />
-                          </TouchableOpacity>
-                      </View>
-                
+      <ScrollView>
+      <Title style={styles.titleText}>{
+        data.registerAs === 'customer' ? 'Register as Customer' : 'Register as Barbershop'
+      }</Title>
+      {
+        data.registerAs === 'customer' ? (
+          <View style={styles.containerForm}>
+            <View style={imageUploaderStyles.container}>
+                {
+                    image  && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />
+                }
+                    
+                    <View style={imageUploaderStyles.uploadBtnContainer}>
+                        <TouchableOpacity onPress={addImage} style={imageUploaderStyles.uploadBtn} >
+                            <Text>{image ? 'Edit' : 'Upload'} Image</Text>
+                            <AntDesign name="camera" size={20} color="black" />
+                        </TouchableOpacity>
+                    </View>
+              
 
-              </View>
-              <FormInput
-                labelName='First Name'
-                value={fname}
-                onChangeText={firstName => setFname(firstName)}
-              />
-              <FormInput
-                labelName='Last Name'
-                value={lname}
-                onChangeText={lastName => setLname(lastName)}
-              />
-              <FormInput
-                labelName='Contact Number'
-                value={contact}
-                autoCapitalize='none'
-                onChangeText={userContact => setContact(userContact)}
-              />
-              <FormInput
-                labelName='Address'
-                value={address}
-                autoCapitalize='none'
-                onChangeText={userAddress => setAddress(userAddress)}
-              />
-              <FormInput
-                labelName='Email'
-                value={email}
-                autoCapitalize='none'
-                onChangeText={userEmail => setEmail(userEmail)}
-              />
-              <FormInput
-                labelName='Password'
-                value={password}
-                secureTextEntry={true}
-                onChangeText={userPassword => setPassword(userPassword)}
-              />
-              <FormInput
-                labelName='Confirm Password'
-                value={confirmPassword}
-                secureTextEntry={true}
-                onChangeText={userConfirmPassword => setConfirmPassword(userConfirmPassword)}
-              />
-              <FormButton
-                title='Signup'
-                modeValue='contained'
-                buttonStyle={styles.signupButtonContainer}
-                labelStyle={styles.signupButtonLabel}
-                onPress={() => register()}
-              />
-              <IconButton
-                icon='keyboard-backspace'
-                size={30}
-                style={styles.navButton}
-                color='#6646ee'
-                onPress={() => navigation.goBack()}
-              />
             </View>
-          ) : (
-            <>
-              <FormInput
-                labelName='Email'
-                value={email}
-                autoCapitalize='none'
-                onChangeText={userEmail => setEmail(userEmail)}
-              />
-              <FormInput
-                labelName='Password'
-                value={password}
-                secureTextEntry={true}
-                onChangeText={userPassword => setPassword(userPassword)}
-              />
-              <FormButton
-                title='Signup'
-                modeValue='contained'
-                buttonStyle={styles.signupButtonContainer}
-                labelStyle={styles.signupButtonLabel}
-              />
-              <IconButton
-                icon='keyboard-backspace'
-                size={30}
-                style={styles.navButton}
-                color='#6646ee'
-                onPress={() => navigation.goBack()}
-              />
-            </>
-          )
-        }
-      </ScrollView>
-      )}
+            <FormInput
+              labelName='Username'
+              value={username}
+              onChangeText={userName => setUsername(userName)}
+            />
+            <FormInput
+              labelName='First Name'
+              value={fname}
+              onChangeText={firstName => setFname(firstName)}
+            />
+            <FormInput
+              labelName='Last Name'
+              value={lname}
+              onChangeText={lastName => setLname(lastName)}
+            />
+            <FormInput
+              labelName='Contact Number'
+              value={contact}
+              autoCapitalize='none'
+              onChangeText={userContact => setContact(userContact)}
+            />
+            <FormInput
+              labelName='Address'
+              value={address}
+              autoCapitalize='none'
+              onChangeText={userAddress => setAddress(userAddress)}
+            />
+            <FormInput
+              labelName='Email'
+              value={email}
+              autoCapitalize='none'
+              onChangeText={userEmail => setEmail(userEmail)}
+            />
+            <FormInput
+              labelName='Password'
+              value={password}
+              secureTextEntry={true}
+              onChangeText={userPassword => setPassword(userPassword)}
+            />
+            <FormInput
+              labelName='Confirm Password'
+              value={confirmPassword}
+              secureTextEntry={true}
+              onChangeText={userConfirmPassword => setConfirmPassword(userConfirmPassword)}
+            />
+            <FormButton
+              title='Signup'
+              loading={loading}
+              modeValue='contained'
+              buttonStyle={styles.signupButtonContainer}
+              labelStyle={styles.signupButtonLabel}
+              onPress={() => register(data.registerAs)}
+            />
+            <IconButton
+              icon='keyboard-backspace'
+              size={30}
+              style={styles.navButton}
+              color='#6646ee'
+              onPress={() => navigation.goBack()}
+            />
+          </View>
+        ) : (
+          <>
+            <FormInput
+              labelName='Email'
+              value={email}
+              autoCapitalize='none'
+              onChangeText={userEmail => setEmail(userEmail)}
+            />
+            <FormInput
+              labelName='Password'
+              value={password}
+              secureTextEntry={true}
+              onChangeText={userPassword => setPassword(userPassword)}
+            />
+            <FormButton
+              title='Signup'
+              modeValue='contained'
+              loading={loading}
+              buttonStyle={styles.signupButtonContainer}
+              labelStyle={styles.signupButtonLabel}
+            />
+            <IconButton
+              icon='keyboard-backspace'
+              size={30}
+              style={styles.navButton}
+              color='#6646ee'
+              onPress={() => navigation.goBack()}
+            />
+          </>
+        )
+      }
+    </ScrollView>
     </View>
   );
 }
