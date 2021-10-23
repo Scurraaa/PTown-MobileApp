@@ -1,12 +1,15 @@
 import React from 'react';
-import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
+import { createMaterialBottomTabNavigator, createStackNavigator } from "@react-navigation/material-bottom-tabs";
 import HomeScreen from "../screens/HomeScreen";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import BarberShopScreen from "../screens/BarberShopScreen";
+import BarberStack from './BarberShopNavigation';
 import MapScreen from "../screens/MapScreen";
 import ProfileScreen from "../screens/ProfileScreen";
-import LoginScreen from '../screens/LoginScreen';
+import HomeStack from './HomeScreenNavigation';
+import MapStack from './MapNavigation';
+
 const Tab = createMaterialBottomTabNavigator();
+
 
 export default function BottomTabs() {
     return (
@@ -17,7 +20,7 @@ export default function BottomTabs() {
         >
             <Tab.Screen
                 name='HomeScreen'
-                component={HomeScreen}
+                component={HomeStack}
                 options={{
                     tabBarLabel: 'Home',
                     tabBarIcon: ({ color }) => (
@@ -27,7 +30,7 @@ export default function BottomTabs() {
             />
              <Tab.Screen
                 name='Barbers List'
-                component={BarberShopScreen}
+                component={BarberStack}
                 options={{
                     tabBarLabel: 'Barber List',
                     tabBarIcon: ({ color }) => (
@@ -36,8 +39,8 @@ export default function BottomTabs() {
                 }}
             />
              <Tab.Screen
-                name='Map'
-                component={MapScreen}
+                name='Map Screen'
+                component={MapStack}
                 options={{
                     tabBarLabel: 'Map',
                     tabBarIcon: ({ color }) => (

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BASE_URL } from '../utils/constants';
@@ -15,9 +15,30 @@ export default function BarberShopScreen({ navigation })  {
         getBarbershops()
     }, [])
 
+    async function setAsFavorite(barberID) {
+        const token = await AsyncStorage.getItem('token')
+        const headers = {
+            "accept": "application/json",
+            "content-type": "application/json",
+            "Authorization": `Bearer ${token}`
+        };
+        await axios({
+            method: 'POST',
+            headers: headers,
+            url: `${BASE_URL}/api/barbershop/${barberID}/add_favorite_user/`
+        }).then(async function (responsed) {
+           console.log('SUCCESS DATA1', responsed.data);
+        }).catch(function(error){
+            console.log("ERROR DATA1", error)
+            console.log("ERROR DATA2", error.response.status)
+        })
+        setLoading(false);
+    }
+
     async function getBarbershops() {
         setLoading(true);
         const token = await AsyncStorage.getItem('token')
+        const userId = await AsyncStorage.getItem('userId')
         const headers = {
             "accept": "application/json",
             "content-type": "application/json",
@@ -28,7 +49,13 @@ export default function BarberShopScreen({ navigation })  {
             headers: headers,
             url: `${BASE_URL}/api/barbershop/`,
         }).then(async function (responsed) {
-            console.log("RESPONSED DATA", responsed.data);
+            for (var i = 0; i<responsed.data.length; i++) {
+                for (var j = 0; j<responsed.data[i].favorites.length; j++) {
+                    if (responsed.data[i].favorites[j].id === parseInt(userId)) {
+                        responsed.data[i].favorite = true
+                    }
+                }
+            }
             setBarbershops(responsed.data);
         }).catch(function(error){
             console.log("ERROR DATA1", error)
@@ -47,21 +74,30 @@ export default function BarberShopScreen({ navigation })  {
                     {
                         barbershops.map((barbershop) => {
                             return(
-                                <CustomCard
+                                <TouchableOpacity
                                     key={barbershop.id}
-                                    data={barbershop} 
-                                    isLiked={barbershop.favorite}
-                                    onLike={(id) =>
-                                        setBarbershops(() => {
-                                            return barbershops.map((barber) => {
-                                                if (barber.id === id) {
-                                                return { ...barber, favorite: !barber.favorite };
-                                                }
-                                                return barber;
-                                            });
-                                        })
-                                    }
-                                />
+                                        onPress={() => navigation.navigate('BarbershopDetails', {
+                                            data: barbershop
+                                        })}
+                                    >
+                                        <CustomCard
+                                            navigation={navigation}
+                                            key={barbershop.id}
+                                            data={barbershop} 
+                                            isLiked={barbershop.favorite}
+                                            onLike={(id) =>
+                                                setMyFavorite(() => {
+                                                    return myFavorite.map((barber) => {
+                                                        if (barber.id === id) {
+                                                            setAsFavorite(barber.id)
+                                                            return { ...barber, favorite: !barber.favorite };
+                                                        }
+                                                        return barber;
+                                                    });
+                                                })
+                                            }
+                                        />
+                                </TouchableOpacity>
                             )
                         })
                     }

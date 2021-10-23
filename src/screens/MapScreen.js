@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import { View, Text, StyleSheet, Dimensions, TouchableHighlight } from 'react-native';
+import { Paragraph } from 'react-native-paper';
+import MapView, { Marker, Callout } from 'react-native-maps';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Loading from '../components/Loading';
 import axios from 'axios';
 import { BASE_URL } from '../utils/constants';
+import Icon from 'react-native-vector-icons/FontAwesome'
 
 export default function MapScreen({ navigation })  {
 
@@ -58,9 +60,28 @@ export default function MapScreen({ navigation })  {
                                         latitude: barber.latitude,
                                         longitude: barber.longitude
                                     }}
-                                    title={barber.name}
-                                    description={barber.description}
-                                />
+                                >
+                                    <Icon name='scissors' color='black' size={24}/>
+                                    <Callout onPress={() => navigation.navigate('BarbershopDetails', {
+                                        data: barber
+                                    })}>
+                                        <View style={{width: 250, padding: 10}}>
+                                            <Text style={{fontWeight: 'bold', fontSize: 25}}>
+                                                {barber.name}
+                                            </Text>
+                                            <Paragraph>
+                                                {barber.description}
+                                            </Paragraph>
+                                            <TouchableHighlight onPress= {()=> navigation.navigate('BarbershopDetails', {
+                                                    data: barber
+                                                })} underlayColor='#dddddd'>
+                                                <View>
+                                                    <Text>SEE FULL DETAILS</Text>
+                                                </View>
+                                            </TouchableHighlight>
+                                        </View>
+                                    </Callout>
+                                </Marker>
                             ))
                         }
                 </MapView>

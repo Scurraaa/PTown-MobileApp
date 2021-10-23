@@ -26,7 +26,7 @@ export default function CustomCard({data, isLiked, onLike = () => {}}) {
       }, [isLiked]);
 
     return(
-        <Card style={styles.cardContainer} key={data.id} onPress={() => console.log('HERE')}>
+        <Card style={styles.cardContainer} key={data.id}>
             <Card.Cover source={{ uri: data.photo ? data.photo : "https://st3.depositphotos.com/23594922/31822/v/600/depositphotos_318221368-stock-illustration-missing-picture-page-for-website.jpg" }} />
             <Card.Title 
                 title={data.name}
