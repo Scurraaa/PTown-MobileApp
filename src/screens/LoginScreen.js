@@ -36,7 +36,7 @@ export default function LoginScreen({ navigation }) {
                 if (responsed.status === 200) {
                     await AsyncStorage.setItem('token', responsed.data.access)
                     await AsyncStorage.setItem('loggedin', "true")
-                    await AsyncStorage.setItem('userId', "8")
+                    await AsyncStorage.setItem('userId', responsed.data.id.toString())
                     Toast.show({
                         type: 'success',
                         position: 'bottom',
@@ -51,6 +51,8 @@ export default function LoginScreen({ navigation }) {
                             navigation.navigate('Home')
                         }
                     })
+                    setUsername("")
+                    setPassword("")
                 }
             }).catch(function(error){
                 console.log("ERROR DATA1", error)

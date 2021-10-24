@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, BackHandler, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { View, Text, StyleSheet, BackHandler, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CustomCard from '../components/CustomCard';
 import Loading from '../components/Loading';
@@ -12,6 +12,7 @@ export default function HomeScreen({ navigation })  {
     const [topBarber, setTopBarber] = useState()
     const [myFavorite, setMyFavorite] = useState([])
     const [loading, setLoading] = useState(false);
+    const [refreshing, setRefreshing] = React.useState(false);
 
     async function getTopMonthBarbershops() {
         setLoading(true);
@@ -40,6 +41,13 @@ export default function HomeScreen({ navigation })  {
             console.log("ERROR DATA2", error.response.status)
         })
     }
+
+    const onRefresh = useCallback(async () => {
+        setRefreshing(true)
+        getTopMonthBarbershops()
+        getMyFavoriteBarbershops()
+        setRefreshing(false)
+    }, [refreshing])
 
     async function getMyFavoriteBarbershops() {
         const token = await AsyncStorage.getItem('token')
@@ -98,7 +106,14 @@ export default function HomeScreen({ navigation })  {
     } else {
         return (
             <View style={styles.container}>
-                <ScrollView>
+                <ScrollView
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={refreshing}
+                            onRefresh={onRefresh}
+                        />
+                    }
+                >
                     <Text style={styles.top}>Top Barbershop of the Month</Text>
                     <View style={styles.topContainer}>
                         {topBarber ? (

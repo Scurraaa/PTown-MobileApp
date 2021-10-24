@@ -1,12 +1,10 @@
 import React from 'react';
 import { createMaterialBottomTabNavigator, createStackNavigator } from "@react-navigation/material-bottom-tabs";
-import HomeScreen from "../screens/HomeScreen";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import BarberStack from './BarberShopNavigation';
-import MapScreen from "../screens/MapScreen";
-import ProfileScreen from "../screens/ProfileScreen";
 import HomeStack from './HomeScreenNavigation';
 import MapStack from './MapNavigation';
+import ProfileStack from './ProfileNavigation';
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -32,7 +30,7 @@ export default function BottomTabs() {
                 name='Barbers List'
                 component={BarberStack}
                 options={{
-                    tabBarLabel: 'Barber List',
+                    tabBarLabel: 'Barbershop List',
                     tabBarIcon: ({ color }) => (
                         <Icon name='format-list-bulleted' color={color} size={26}/>
                     )
@@ -49,8 +47,8 @@ export default function BottomTabs() {
                 }}
             />
             <Tab.Screen
-                name='Profile'
-                component={ProfileScreen}
+                name='Profile Stack'
+                component={ProfileStack}
                 options={{
                     tabBarLabel: 'Profile',
                     tabBarIcon: ({ color }) => (

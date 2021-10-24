@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BASE_URL } from '../utils/constants';
@@ -10,6 +10,7 @@ export default function BarberShopScreen({ navigation })  {
 
     const [barbershops, setBarbershops] = useState([])
     const [loading, setLoading] = useState(false)
+    const [refreshing, setRefreshing] = useState(false)
 
     useEffect(() => {
         getBarbershops()
@@ -64,12 +65,25 @@ export default function BarberShopScreen({ navigation })  {
         setLoading(false);
     }
 
+    const onRefresh = useCallback(async () => {
+        setRefreshing(true)
+        getBarbershops()
+        setRefreshing(false)
+    }, [refreshing])
+
     if (loading) {
         return <Loading size='large'/>
     } else {
         return (
             <View style={styles.container}> 
-                <ScrollView>
+                <ScrollView
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={refreshing}
+                            onRefresh={onRefresh}
+                        />
+                    }
+                >
                     <Text style={styles.barbershops}>List of Barbershop</Text>
                     {
                         barbershops.map((barbershop) => {
@@ -86,8 +100,8 @@ export default function BarberShopScreen({ navigation })  {
                                             data={barbershop} 
                                             isLiked={barbershop.favorite}
                                             onLike={(id) =>
-                                                setMyFavorite(() => {
-                                                    return myFavorite.map((barber) => {
+                                                setBarbershops(() => {
+                                                    return barbershops.map((barber) => {
                                                         if (barber.id === id) {
                                                             setAsFavorite(barber.id)
                                                             return { ...barber, favorite: !barber.favorite };
