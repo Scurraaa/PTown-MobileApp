@@ -14,7 +14,7 @@ import moment from 'moment';
 import Toast from 'react-native-toast-message'
 
 
-export default function BarbershopDetails({ navigation, route }) {
+export default function SignupBarbershopDetails({ navigation, route }) {
     const [data, setData] = useState(route.params);
     const [isLiked, setisLiked] = useState(route.params.data.favorite);
     const [toggleButton, setToggleButton] = useState(false);
@@ -23,116 +23,6 @@ export default function BarbershopDetails({ navigation, route }) {
     const [rating, setRating] = useState(0);
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
-    const animation = React.useRef(null);
-    const isFirstRun = React.useRef(true);
-
-    React.useEffect(() => {
-        if (isFirstRun.current) {
-          if (isLiked) {
-            animation.current.play(66, 66);
-          } else {
-            animation.current.play(19, 19);
-          }
-          isFirstRun.current = false;
-        } else if (isLiked) {
-          animation.current.play(19, 50);
-        } else {
-          animation.current.play(0, 19);
-        }
-      }, [isLiked]);
-
-    
-      async function postComment(barberId, comment2) {
-        const commentObj = {
-            type: "positive",
-            text: comment,
-            rating: rating,
-        }
-        const token = await AsyncStorage.getItem('token')
-        const headers = {
-            "accept": "application/json",
-            "content-type": "application/json",
-            "Authorization": `Bearer ${token}`
-        };
-        const axiosReq = await axios({
-            method: 'PATCH',
-            headers: headers,
-            url: `${BASE_URL}/api/barbershop/${barberId}/`,
-            data: {
-                comments: [
-                    ...comment2,
-                    commentObj
-                ]
-            }
-        }).then(async function (responsed) {
-            const returnedData = {
-                data: responsed.data
-            }
-            setData(returnedData)
-            setVisible(!visible)
-        }).catch(function(error){
-            console.log('ERROR DATA1', error.response.data);
-        })
-    }
-
-    async function setAsFavorite(barberID) {
-        const token = await AsyncStorage.getItem('token')
-        const headers = {
-            "accept": "application/json",
-            "content-type": "application/json",
-            "Authorization": `Bearer ${token}`
-        };
-        await axios({
-            method: 'POST',
-            headers: headers,
-            url: `${BASE_URL}/api/barbershop/${barberID}/add_favorite_user/`
-        }).then(async function (responsed) {
-           console.log('SUCCESS DATA1', responsed.data);
-        }).catch(function(error){
-            console.log("ERROR DATA1", error)
-            console.log("ERROR DATA2", error.response.status)
-        })
-    }
-
-    async function setAppointment(date, time, barbershopID) {
-        const token = await AsyncStorage.getItem('token')
-        const headers = {
-            'accept': 'application/json',
-            'content-type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        };
-        await axios({
-            method: 'POST',
-            headers: headers,
-            url: `${BASE_URL}/api/barbershop/${barbershopID}/add_appointment/`,
-            data: {
-                date: date,
-                time: time
-            }
-        }).then(async function(responsed) {
-            console.log('RESPONSE FROM ADD APPOINTMENT', responsed.data)
-            Toast.show({
-                type: 'success',
-                position: 'bottom',
-                text1: "INFO",
-                text2: 'Successfully set an appointment!',
-                visibilityTime: TOAST_TIMEOUT,
-                autoHide: true,
-            })
-        }).catch(function(error) {
-            console.log('ERROR ON ADD APPOINTMENT:', error.response.data)
-            if (error.response.status == 400) {
-                Toast.show({
-                    type: 'error',
-                    position: 'bottom',
-                    text1: "INFO",
-                    text2: error.response.data.non_field_errors[0],
-                    visibilityTime: TOAST_TIMEOUT,
-                    autoHide: true,
-                })
-            }
-        })
-    }
 
     const showDatePicker = () => {
         setDatePickerVisibility(true);
@@ -140,19 +30,6 @@ export default function BarbershopDetails({ navigation, route }) {
     
     const hideDatePicker = () => {
         setDatePickerVisibility(false);
-    };
-
-    const handleConfirm = (date, id) => {
-        console.log(date);
-        const format1 = 'hh:mm'
-        const format2 = 'YYYY-MM-DD'
-        let date1 = new Date(date)
-        let date2 = new Date(date)
-        const formattedDate = moment(date1).format(format1);
-        const formattedDate2 = moment(date2).format(format2)
-        console.log(formattedDate, formattedDate2)
-        hideDatePicker();
-        setAppointment(formattedDate2, formattedDate, id);
     };
     
     return (
@@ -163,23 +40,6 @@ export default function BarbershopDetails({ navigation, route }) {
                     <View style={styles.nameAndFavoriteContainer}>
                         <View>
                             <Text style={styles.barberName}>{data.data.name} {data.data.verified ? <Icon name='check-decagram' color='#6200ee' size={18}/> : <View></View>}</Text>
-                        </View>
-                        <View style={{ marginLeft: 'auto'}}>
-                            <TouchableOpacity
-                                onPress={() => {
-                                    setisLiked(!isLiked)
-                                    setAsFavorite(data.data.id)
-                                }}
-                            >
-                                <LottieView
-                                    ref={animation}
-                                    style={styles.heartLottie}
-                                    source={require("../../assets/like.json")}
-                                    autoPlay={false}
-                                    loop={false}
-                                    resizeMode="cover"
-                            />
-                            </TouchableOpacity>
                         </View>
                     </View>
                     <View style={styles.addressContainer}>
@@ -288,14 +148,8 @@ export default function BarbershopDetails({ navigation, route }) {
                                         </View>
                                     )}
                                 </View>
-                                <Button icon="book" mode="contained" onPress={() => showDatePicker()}>
+                                <Button icon="book" mode="contained" onPress={() => navigation.navigate('RegisterAs')}>
                                     Book an Appointment!
-                                </Button>
-                                <Button icon='message' mode='contained' style={{marginTop: 10, maringBottom: 10}} onPress={() => navigation.navigate('Message Screen', { barbershop: data.data})}>
-                                    Message us!
-                                </Button>
-                                <Button mode="text" onPress={() => navigation.pop()} style={{marginTop: 10}}>
-                                    Go back
                                 </Button>
                                 <DateTimePickerModal
                                     isVisible={isDatePickerVisible}
@@ -352,37 +206,6 @@ export default function BarbershopDetails({ navigation, route }) {
                                     )
                                 }
                                 <View>
-                                <Button icon="comment" mode="contained" onPress={() => setVisible(!visible)}>
-                                    Add Comment
-                                </Button>
-                                <Portal>
-                                    <Modal visible={visible} onDismiss={() => setVisible(!visible)} contentContainerStyle={{backgroundColor: 'white', padding: 20, margin: 20}}>
-                                    <TextInput
-                                        label="Comment"
-                                        value={comment}
-                                        multiline={true}
-                                        numberOfLines={5}
-                                        onChangeText={comment => setComment(comment)}
-                                        style={{marginBottom: 10}}
-                                    />
-                                    <Rating
-                                        ratingCount={5}
-                                        imageSize={25}
-                                        startingValue={rating}
-                                        fractions={2}
-                                        tintColor={'#efefef'}
-                                        onFinishRating={(rtng) => setRating(rtng)}
-                                        style={{marginBottom: 10}}
-                                    />
-                                    <Button icon="comment" mode="contained" onPress={() => postComment(data.data.id, data.data.comments)}>
-                                        Submit Comment
-                                    </Button>
-                                    </Modal>
-                                </Portal>
-                                <Button mode="text" onPress={() => navigation.pop()} style={{marginTop: 10}}>
-                                    Go back
-                                </Button>
-                        
                                 </View>
                             </View>
                         </View>

@@ -6,7 +6,7 @@ import Loading from '../components/Loading';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Button } from 'react-native-paper'
 
-export default function ProfileScreen({ navigation })  {
+export default function ProfileBarbershopScreen({ navigation })  {
 
     const [profile, setProfile] = useState(null)
     const [loading, setLoading] = useState(false)
@@ -16,17 +16,6 @@ export default function ProfileScreen({ navigation })  {
         getProfile()
     }, [])
 
-    async function  addImage()  {
-        let _image = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsEditing: true,
-            aspect: [4,3],
-            quality: 1,
-          });
-        if (!_image.cancelled) {
-            setImage(_image.uri);
-        }
-      };
 
     async function getProfile() {
         setLoading(true);
@@ -42,7 +31,6 @@ export default function ProfileScreen({ navigation })  {
             headers: headers,
             url: `${BASE_URL}/api/profile/?user=${userId}`,
         }).then(async function (responsed) {
-            setImage(responsed.data[0].photo)
             setProfile(responsed.data[0])
         }).catch(function(error){
             console.log("ERROR DATA1", error)
@@ -64,21 +52,16 @@ export default function ProfileScreen({ navigation })  {
     else {
         return (
             <View style={styles.container}>
-               <View style={imageUploaderStyles.container}>
-                    {
-                        image  && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />
-                    }
-                </View>
                 <View style={{height: 200}}>
-                    <Button style={{width: 250, margin: 5}} icon="emoticon" mode="contained" onPress={() => navigation.navigate('Edit Profile', {
+                    <Button style={{width: 300, margin: 5}} icon="emoticon" mode="contained" onPress={() => navigation.navigate('Edit Profile', {
                         profile: profile
                     })}>
-                        Edit Profile
+                        Edit Barbershop Profile
                     </Button>
-                    <Button style={{width: 250, margin: 5 }} icon="book" mode="contained" onPress={() => navigation.navigate('Appoinment Screen')}>
-                        My Bookings
+                    <Button style={{width: 300, margin: 5}} icon="book" mode="contained" onPress={() => navigation.navigate('Appoinment Screen')}>
+                        Bookings
                     </Button>
-                    <Button style={{width: 250, margin: 5}} icon="logout" mode="contained" onPress={() => navigation.navigate('Login')}>
+                    <Button style={{width: 300, margin: 5}} icon="logout" mode="contained" onPress={() => navigation.navigate('Login')}>
                         Log Out
                     </Button>
                 </View>
@@ -95,29 +78,3 @@ const styles = StyleSheet.create({
         marginTop: 50
     }
 })
-
-const imageUploaderStyles=StyleSheet.create({
-    container:{
-        elevation:2,
-        height:150,
-        width:150, 
-        backgroundColor:'#efefef',
-        position:'relative',
-        borderRadius:999,
-        overflow:'hidden',
-    },
-    uploadBtnContainer:{
-        opacity:0.7,
-        position:'absolute',
-        right:0,
-        bottom:0,
-        backgroundColor:'lightgrey',
-        width:'100%',
-        height:'25%',
-    },
-    uploadBtn:{
-        display:'flex',
-        alignItems:"center",
-        justifyContent:'center'
-    }
-  })

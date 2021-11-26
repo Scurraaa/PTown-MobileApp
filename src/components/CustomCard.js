@@ -1,10 +1,11 @@
 import React from 'react';
-import { StyleSheet, Text, Touchable, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { Card, Paragraph } from 'react-native-paper'
 import LottieView from "lottie-react-native";
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 
 
-export default function CustomCard({data, isLiked, onLike = () => {}}) {
+export default function CustomCard({data, isLiked, isVerified, onLike = () => {}}) {
 
 
     const animation = React.useRef(null);
@@ -32,19 +33,22 @@ export default function CustomCard({data, isLiked, onLike = () => {}}) {
                 title={data.name}
                 subtitle={data.address}
                 right={(props) => 
-                <TouchableOpacity
-                    onPress={() => {
-                        onLike(data.id)
-                    }}
-                >
-                    <LottieView
-                        ref={animation}
-                        style={styles.heartLottie}
-                        source={require("../../assets/like.json")}
-                        autoPlay={false}
-                        loop={false}
-                  />
-                </TouchableOpacity>
+                  <View style={{flex: 1, flexDirection: 'row'}}>
+                    {isVerified ? <Icon style={{marginTop: 15}} name='check-decagram' color='#6200ee' size={18}/> : <View></View>}
+                    <TouchableOpacity
+                      onPress={() => {
+                          onLike(data.id)
+                      }}
+                    >
+                      <LottieView
+                          ref={animation}
+                          style={styles.heartLottie}
+                          source={require("../../assets/like.json")}
+                          autoPlay={false}
+                          loop={false}
+                    />
+                    </TouchableOpacity>
+                  </View>
                 }
             />
             <Card.Content>

@@ -126,6 +126,7 @@ export default function HomeScreen({ navigation })  {
                                     navigation={navigation}
                                     data={topBarber} 
                                     isLiked={topBarber.favorite}
+                                    isVerified={topBarber.verified}
                                     onLike={(id) => {
                                         topBarber.favorite = !topBarber.favorite;
                                         setAsFavorite(id)
@@ -155,6 +156,7 @@ export default function HomeScreen({ navigation })  {
                                                     key={favorites.id}
                                                     data={favorites} 
                                                     isLiked={favorites.favorite}
+                                                    isVerified={favorites.verified}
                                                     onLike={(id) =>
                                                         setMyFavorite(() => {
                                                             return myFavorite.map((barber) => {

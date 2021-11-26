@@ -22,6 +22,7 @@ export default function MapScreen({ navigation })  {
 
     useEffect(() => {
         (async () => {
+          await getBarbershops()
           let { status } = await Location.requestForegroundPermissionsAsync();
           if (status !== 'granted') {
             return;
@@ -34,7 +35,6 @@ export default function MapScreen({ navigation })  {
                 setLoading(false);
             }
           }, 2000)
-          await getBarbershops()
         })();
       }, []);
 
@@ -89,77 +89,66 @@ export default function MapScreen({ navigation })  {
             map.current.animateToRegion({
                 latitude: location.latitude,
                 longitude: location.longitude,
-                latitudeDelta: 0.03,
+                latitudeDelta: 0.004,
                 longitudeDelta: 0.005
             })
         }
     }
 
-    if (loading) {
-        return <Loading size='large'/>
-    } else {
-        return (
-            <View style={styles.container}>
-                <MapView 
-                    ref={map}
-                    style={styles.map}
-                    showsUserLocation={true}
-                    initialRegion={{
-                        latitude: latitude,
-                        longitude: longitude,
-                        latitudeDelta: 0.03,
-                        longitudeDelta: 0.005
-                    }}>
-                        {
-                            barbershops.length > 0 ? (
-                                barbershops.map((barber, index) => (
-                                    <Marker
-                                        key={index}
-                                        coordinate={{
-                                            latitude: barber.latitude,
-                                            longitude: barber.longitude
-                                        }}
-                                    >
-                                        <Callout onPress={() => navigation.navigate('BarbershopDetails', {
-                                            data: barber
-                                        })}>
-                                            <View style={{width: 250, padding: 10}}>
-                                                <Text style={{fontWeight: 'bold', fontSize: 25}}>
-                                                    {barber.name}
-                                                </Text>
-                                                <Paragraph>
-                                                    {barber.description}
-                                                </Paragraph>
-                                                <TouchableHighlight onPress= {()=> navigation.navigate('BarbershopDetails', {
-                                                        data: barber
-                                                    })} underlayColor='#dddddd'>
-                                                    <View>
-                                                        <Text>See Full Details</Text>
-                                                    </View>
-                                                </TouchableHighlight>
-                                            </View>
-                                        </Callout>
-                                    </Marker>
-                                ))
-                            ) : (
-                                <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                                    <Text>No Fetched Data</Text>
-                                </View>
-                            )
-                        }
-                </MapView>
-                <Carousel
-                    ref={ref}
-                    containerCustomStyle={styles.carousel}
-                    data={barbershops}
-                    renderItem={renderItem}
-                    sliderWidth={SCREEN_WIDTH}
-                    itemWidth={300}
-                    onSnapToItem={(index) => onCarouselChange(index)}
-                />
-            </View>
-        )
-    }
+    return (
+        <View style={styles.container}>
+            {
+                loading ? (
+                    <Loading size='large'/>
+                ) : (
+                    barbershops.length > 0 ? (
+                    <>
+                        <MapView 
+                                ref={map}
+                                style={styles.map}
+                                showsUserLocation={true}
+                                initialRegion={{
+                                    latitude: latitude,
+                                    longitude: longitude,
+                                    latitudeDelta: 0.004,
+                                    longitudeDelta: 0.005
+                                }}
+                                >
+                                    {
+                                        barbershops.map((barber, index) => (
+                                            <Marker
+                                                key={`${barber.latitude}_${barber.longitude}`}
+                                                coordinate={{
+                                                    latitude: barber.latitude,
+                                                    longitude: barber.longitude
+                                                }}
+                                                tilte={barber.name}
+                                                description={barber.description}
+                                            >
+                                            </Marker>
+                                        ))
+                                    }
+                            </MapView>
+                            <Carousel
+                                ref={ref}
+                                containerCustomStyle={styles.carousel}
+                                data={barbershops}
+                                renderItem={renderItem}
+                                sliderWidth={SCREEN_WIDTH}
+                                itemWidth={300}
+                                onSnapToItem={(index) => onCarouselChange(index)}
+                        />
+                    </>
+                    ) : (
+                        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+                            <Text>NO FETCHED DATA PLEASE RELOAD THE APP</Text>
+                        </View>
+                    )
+                )
+            }
+        </View>
+    )
+
 }
 
 const styles = StyleSheet.create({

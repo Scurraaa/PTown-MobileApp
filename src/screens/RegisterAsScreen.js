@@ -17,14 +17,12 @@ export default function RegisterAs({ navigation }) {
                 })}>
             </FormButton>
             <FormButton
-                title='Register as Barbershop'
+                title='Apply for Listing of Barbershop'
                 modeValue='contained'
                 labelStyle={styles.buttonLabel}
-                buttonStyle={styles.notAvailButton}
-                // onPress={() => navigation.navigate('Signup', {
-                //     registerAs: 'barbershop'
-                // })}>
-            >
+                onPress={() => navigation.navigate('BarberSignup', {
+                    registerAs: 'barbershop'
+                })}>
             </FormButton>
         </View>
     )

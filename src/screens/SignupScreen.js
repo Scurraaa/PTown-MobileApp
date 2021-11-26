@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, Image, Text, ScrollView } from 'react-native';
-import { Title, IconButton } from 'react-native-paper';
+import { View, StyleSheet, TouchableOpacity, Image, Text, ScrollView, CheckBox } from 'react-native';
+import { Title, IconButton, Modal, Portal, Paragraph } from 'react-native-paper';
 import FormInput from '../components/FormInput';
 import FormButton from '../components/FormButton';
 import { AntDesign } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { BASE_URL, SCREEN_WIDTH, TOAST_TIMEOUT } from '../utils/constants';
 import Toast from 'react-native-toast-message';
-import Loading from '../components/Loading';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -22,6 +21,8 @@ export default function SignupScreen({ route, navigation }) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [isSelected, setSelection] = useState(false)
+  const [visible, setVisible] = useState(false);
 
   async function  addImage()  {
     let _image = await ImagePicker.launchImageLibraryAsync({
@@ -185,11 +186,6 @@ export default function SignupScreen({ route, navigation }) {
 
             </View>
             <FormInput
-              labelName='Username'
-              value={username}
-              onChangeText={userName => setUsername(userName)}
-            />
-            <FormInput
               labelName='First Name'
               value={fname}
               onChangeText={firstName => setFname(firstName)}
@@ -218,6 +214,11 @@ export default function SignupScreen({ route, navigation }) {
               onChangeText={userEmail => setEmail(userEmail)}
             />
             <FormInput
+              labelName='Username'
+              value={username}
+              onChangeText={userName => setUsername(userName)}
+            />
+            <FormInput
               labelName='Password'
               value={password}
               secureTextEntry={true}
@@ -229,7 +230,37 @@ export default function SignupScreen({ route, navigation }) {
               secureTextEntry={true}
               onChangeText={userConfirmPassword => setConfirmPassword(userConfirmPassword)}
             />
-            <FormButton
+            <View style={{flexDirection: 'row', marginBottom: 20}}>
+              <CheckBox
+                value={isSelected}
+                tintColors={{ true: '#6200ee'}}
+                onValueChange={setSelection}
+                style={{alignSelf: 'center'}}
+              />
+              <TouchableOpacity style={{margin: 8}} onPress={() => setVisible(!visible)}>
+                <Text style={{margin: 8}}>I agree to the <Text style={{color:'#6200ee', }}>Privacy Policy</Text></Text>
+              </TouchableOpacity>
+              <Portal>
+                <Modal visible={visible} onDismiss={() => setVisible(!visible)} contentContainerStyle={{backgroundColor: 'white', padding: 20, margin: 20}}>
+                  <Paragraph>
+                    In 2012, the Philippines passed Republic Act No. 10173 or the Data Privacy Act of 2012 (DPA) “to protect the fundamental human right to privacy of communication while ensuring free flow of information to promote innovation and growth [and] the [State’s] inherent obligation to ensure that personal information in information and communications systems in government and in the private sector are secured and protected”. 
+                    The DPA was passed in accordance with the Philippines agreements under ASEAN Vision 2020 and at the urging of the growing business process outsourcing industry. The law was modeled after the Data Protection Directive (95/46/EC) with many of its terminologies and provisions similar to privacy laws in other jurisdictions.
+
+                    The DPA and its Implementing Rules and Regulations (IRR) apply to all acts done or practices engaged in and outside of the Philippines if:
+
+                    If the person, either an individual or an institution, involved in the processing of personal data is located in the Philippines;
+                    The act or practice involves personal data of a Philippine citizen or Philippine resident;
+                    The processing of personal data is done in the Philippines; or
+                    The act, practice or processing of personal data is done by an entity with links to the Philippines, subject to international law and comity.
+                    “Personal data” refers to all types of personal information.
+
+                    “Processing” is any operation/s performed upon personal data. These operations include, but are not limited to the collection, recording, organization, storage, updating or modification, retrieval, consultation, use, consolidation, blocking, erasure, or destruction of data.
+                  </Paragraph>
+                </Modal>
+            </Portal>
+            </View>
+            {isSelected ? (
+              <FormButton
               title='Signup'
               loading={loading}
               modeValue='contained'
@@ -237,6 +268,9 @@ export default function SignupScreen({ route, navigation }) {
               labelStyle={styles.signupButtonLabel}
               onPress={() => register(data.registerAs)}
             />
+            ) : (
+              <View></View>
+            )}
             <IconButton
               icon='keyboard-backspace'
               size={30}

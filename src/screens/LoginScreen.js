@@ -1,17 +1,19 @@
-import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Title } from 'react-native-paper';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, Image, Text } from 'react-native';
+import { Portal, Modal } from 'react-native-paper';
 import FormInput from '../components/FormInput';
 import FormButton from '../components/FormButton';
 import Toast from 'react-native-toast-message'
 import { TOAST_TIMEOUT, SCREEN_WIDTH, BASE_URL } from '../utils/constants';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Loading from '../components/Loading';
 
 export default function LoginScreen({ navigation }) {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [loading, setLoading] = useState(false)
+    const [visible1, setVisible1] = useState(true)
 
 
     async function logginIn(username, password) {
@@ -37,20 +39,49 @@ export default function LoginScreen({ navigation }) {
                     await AsyncStorage.setItem('token', responsed.data.access)
                     await AsyncStorage.setItem('loggedin', "true")
                     await AsyncStorage.setItem('userId', responsed.data.id.toString())
-                    Toast.show({
-                        type: 'success',
-                        position: 'bottom',
-                        text1: "INFO",
-                        text2: 'Successfully Logged in!',
-                        visibilityTime: TOAST_TIMEOUT,
-                        style: {
-                            backgroundColor: '#6200ee'
-                        },
-                        autoHide: true,
-                        onHide: () => {
-                            navigation.navigate('Home')
-                        }
-                    })
+                    await AsyncStorage.setItem('account_type', responsed.data.type)
+                    if (responsed.data.type === 'user') {
+                        Toast.show({
+                            type: 'success',
+                            position: 'bottom',
+                            text1: "INFO",
+                            text2: 'Successfully Logged in!',
+                            visibilityTime: TOAST_TIMEOUT,
+                            style: {
+                                backgroundColor: '#6200ee'
+                            },
+                            autoHide: true,
+                            onHide: () => {
+                                navigation.navigate('Home')
+                            }
+                        })
+                    } else if (responsed.data.type === 'owner') {
+                        await axios({
+                            method: 'GET',
+                            headers: {
+                                'Authorization': `Bearer ${responsed.data.access}`
+                            },
+                            url: `${BASE_URL}/api/profile/?user=${responsed.data.id}`,
+                        }).then(async(response) => {
+                            await AsyncStorage.setItem('barbershopID', response.data[0].barbershop[0].id.toString())
+                            Toast.show({
+                                type: 'success',
+                                position: 'bottom',
+                                text1: "INFO",
+                                text2: 'Successfully Logged in!',
+                                visibilityTime: TOAST_TIMEOUT,
+                                style: {
+                                    backgroundColor: '#6200ee'
+                                },
+                                autoHide: true,
+                                onHide: () => {
+                                    navigation.navigate('Home2', response.data[0].barbershop[0])
+                                }
+                            })
+                        }).catch((e) => {
+                            console.log('ERRROR FROM GET PROFILE', e)
+                        })
+                    }
                     setUsername("")
                     setPassword("")
                 }
@@ -84,10 +115,10 @@ export default function LoginScreen({ navigation }) {
         }
         else return false
     }
-    
+
     return (
         <View style={styles.container}>
-            <Title style={styles.titleText}>Welcome to PTown</Title>
+            <Image source={require('../../assets/logo1.png')} style={{width: 250, height: 250}}/>
             <FormInput
                 labelName='Username'
                 value={username}
@@ -116,6 +147,23 @@ export default function LoginScreen({ navigation }) {
                 labelStyle={styles.navButtonText}
                 onPress={() => navigation.navigate('RegisterAs')}
             />
+
+            <Portal>
+                <Modal visible={visible1} onDismiss={() => setVisible1(!visible1)} contentContainerStyle={{backgroundColor: 'white', padding: 25, margin: 20}}>
+                        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', marginBottom: 10}}>
+                            <Text style={{fontSize: 18}}>Do you want to cut your hair?</Text>
+                        </View>
+                        <FormButton
+                            title="Let's Go!"
+                            loading={loading}
+                            modeValue='contained'
+                            onPress={() => {
+                                setVisible1(!visible1)
+                                navigation.navigate('SignupBarberList')
+                            }}
+                        />
+                </Modal>
+            </Portal>
         </View>
     )
 }
